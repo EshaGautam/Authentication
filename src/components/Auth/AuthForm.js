@@ -14,49 +14,54 @@ const AuthForm = () => {
 
 
   const submitHandler = async(event)=>{
+  
+    try {
+      event.preventDefault();
+      const enteredEmail = emailInput.current.value;
+      const enteredPassword = passwordInput.current.value;
+      setSending(true);
+      let url
+      if (isLogin) {
+        url =
+          "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyArdEtkjfiCjPXg8O1W8SxYhW8fw8FloyY";
+      } else {
+        url =
+          "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyArdEtkjfiCjPXg8O1W8SxYhW8fw8FloyY";
+      }
 
-    try{ event.preventDefault()
-    const enteredEmail =  emailInput.current.value;
-    const enteredPassword =  passwordInput.current.value;
-    
-    if(isLogin){
+      const existingUser = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+          email: enteredEmail,
+          password: enteredPassword,
+          returnSecureToken: true,
+        }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
 
+      if (existingUser.ok) {
+        const response = await existingUser.json();
+        console.log(response);
+      } else {
+        const response = await existingUser.json();
+
+        let errorMessage = "Authentication Failed";
+
+        if (response && response.error && response.error.message) {
+          errorMessage = response.error.message;
+          throw new Error(errorMessage);
+        }
+      }
+    } catch (error) {
+      alert(error);
     }
-    else{
-      setSending(true)
-       const userData = await fetch(
-         "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyArdEtkjfiCjPXg8O1W8SxYhW8fw8FloyY",
-         {
-           method: "POST",
-           body: JSON.stringify({
-             email: enteredEmail,
-             password: enteredPassword,
-             returnSecureToken: true,
-           }),
-           headers: {
-             "content-type": "application/json",
-           },
-         }
+    setSending(false);
+    
+}
 
-       );
-       if(userData.ok){
-      
-       }
-       else{
-        let response = await userData.json()
-        let errorMessage = 'Authenticaton Failed'
-        if(response && response.error && response.error.message)
-        errorMessage= response.error.message
 
-        throw new Error(errorMessage)
-       }
-    }}
-   catch(error){
-    alert(error)
-   }
-   setSending(false)
-
-  }
 
   return (
     <section className={classes.auth}>
