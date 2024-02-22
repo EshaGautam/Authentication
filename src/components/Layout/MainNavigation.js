@@ -10,6 +10,7 @@ const MainNavigation = () => {
   const history = useHistory()
   const handleLogOut=()=>{
     logOutHandler()
+
     history.replace('/auth')
   }
   return (
