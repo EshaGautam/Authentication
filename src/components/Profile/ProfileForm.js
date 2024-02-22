@@ -2,43 +2,56 @@ import { useRef } from 'react';
 import classes from './ProfileForm.module.css';
 import AuthContext from '../Store/Auth-Context';
 import { useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 
 const ProfileForm = () => {
-   const AuthCtx = useContext(AuthContext);
-  const { token} = AuthCtx;
+  const AuthCtx = useContext(AuthContext);
+  const {token} = AuthCtx;
 const passwordInputRef = useRef()
+const history = useHistory();
+const handleChangePassword = async (event) => {
+  try {
+     const newPassword = passwordInputRef.current.value;
+    event.preventDefault();
+   
+    const url =
+      "https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyArdEtkjfiCjPXg8O1W8SxYhW8fw8FloyY";
+    const ChangePassword = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify({
+        idToken: token,
+        password: newPassword,
+        returnSecureToken: false,
+      }),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+const response = await ChangePassword.json();
 
-const handleChangePassword =async(event)=>{
-  try
-  {event.preventDefault()
+if (ChangePassword.ok) {
+   history.replace("/");
+  alert("Password Changed Successfully");
+  console.log(response);
+ 
+} 
+  else {
+      let errorMessage = "Error Changing Password";
+      if (response && response.error && response.error.message) {
+        errorMessage = response.error.message;
+      }
 
-const ChangePassword = await fetch(
-  "https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyArdEtkjfiCjPXg8O1W8SxYhW8fw8FloyY",
-  {
-    method: "POST",
-    body: JSON.stringify({
-      idToken: token,
-      password: passwordInputRef.current.value,
-      returnSecureToken: false,
-    }),
-    headers: {
-      "content-type": "application/json",
-    },
+      throw new Error(errorMessage);
+    }
+
   }
-);
-const response = await ChangePassword.json()
-if(response.ok){
-  alert('Password Changed Successfully')
-}
-else{
-  throw new Error(response.error.message)
-}
-}
-catch(error){
-alert('Error Changing in password')
-}
+   catch (error) {
+    alert("Error Changing Password");
+ 
+  }
+};
 
-}
+
 
   return (
     <form className={classes.form} onSubmit={handleChangePassword}>

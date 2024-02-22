@@ -7,11 +7,12 @@ const AuthContextProvider = (props) => {
 
   const isUserLoggedIn = !!token;
 
-  const loginHandler = (token) => {
-    setToken(token);
+  const loginHandler = (id) => {
+    setToken(id);
   };
   const logOutHandler = () => {
     setToken(null);
+     console.log("Token after logout:", token);
   };
 
   const ContextValue = {

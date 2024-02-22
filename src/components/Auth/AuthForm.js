@@ -1,12 +1,14 @@
 import { useState, useRef, useContext } from 'react';
 import classes from './AuthForm.module.css';
 import AuthContext from '../Store/Auth-Context';
+import { useHistory } from 'react-router-dom';
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [sending,setSending] = useState(false)
   const emailInput = useRef()
   const passwordInput = useRef()
+  const history = useHistory()
 
 const AuthCtx = useContext(AuthContext)
 const{loginHandler}= AuthCtx
@@ -49,6 +51,7 @@ const{loginHandler}= AuthCtx
       if (existingUser.ok) {
         const response = await existingUser.json();
         loginHandler(response.idToken)
+        history.replace('/')
          
       } else {
         const response = await existingUser.json();
